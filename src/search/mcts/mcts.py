@@ -170,6 +170,4 @@ class MCTSTree():
         """ Backpropagate a reward through a trajectory """
         for node, action_id in zip(path[:-1], actions_ids):
             node.children_visits[action_id] += 1
-            n = node.children_visits[action_id]
-            q = node.children_values[action_id]
-            node.children_values[action_id] += (reward - q) / n
+            node.children_values[action_id] = np.maximum(reward, node.children_values[action_id])
