@@ -10,5 +10,5 @@ if __name__ == '__main__':
 
     start = time.time()
     best_node = mcts_tree.run(100000)
-    print(f'Best config found in {time.time()-start:.1f}s: {best_node} with value {best_node}')
+    print(f'Best config found in {time.time()-start:.1f}s: {best_node} with value {best_node.value}')
 
