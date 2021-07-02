@@ -6,5 +6,5 @@ if __name__ == '__main__':
     dataframe = load_dataframe('2021_03_12_slate.csv', empty_positions)
     budget = 50000
     mcts_tree = MCTSTree(dataframe, empty_positions, budget, exploration=1.)
-    mcts_tree.run(1000)
+    mcts_tree.run(100000)
 
