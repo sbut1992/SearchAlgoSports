@@ -138,6 +138,7 @@ class MCTSTree():
                 minutes_left, seconds_left = divmod(eta, 60)
                 time_print = f"[{minutes:02.0f}:{seconds:02.0f}-{minutes_left:02.0f}:{seconds_left:02.0f}]"
                 print(f"{sim+1}/{n_simulations} - {time_print} - {running_average_eval:.2f} avg reward - {len(self.nodes)} nodes")
+        return self.best_node
 
     def select(self) -> MCTSNode:
         """ Select a leaf node to start from
