@@ -23,7 +23,7 @@ def complete_eligibility(dataframe, positions_to_fill):
             return '/'.join(position_list)
 
     dataframe['POSITIONS'] = dataframe['POSITIONS'].apply(modify_position_eligibility)
-
+    dataframe = dataframe.sort_values(by='SALARY',ascending=False)
 
 def load_dataframe(path, positions_to_fill):
     dataframe = pd.read_csv(path)
