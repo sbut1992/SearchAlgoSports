@@ -21,7 +21,7 @@ class MCTSNode():
         self.nodes = nodes
         self.level = level
         self.legal_actions = get_legal_actions(salaries, names, available_pos, 
-            empty_positions, self.players_lineup, self.budget_left,self.level)
+            empty_positions, self.players_lineup, self.budget_left, self.level)
 
         self.children = [None for _ in self.legal_actions]
         self.children_visits = np.array([0 for _ in self.legal_actions])
