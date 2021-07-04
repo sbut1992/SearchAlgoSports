@@ -29,12 +29,9 @@ class MCTSNode():
 
     def build_children(self, action:int):
         new_empty_positions = copy(self.empty_positions)
-        position = np.random.choice(np.where(
-            np.logical_and(self.available_pos[action][self.level], self.empty_positions)
-        )[0])
-        new_empty_positions[position] = 0
+        new_empty_positions[self.level] = 0
 
-        new_lineup = self.lineup + [(position, action)]
+        new_lineup = self.lineup + [(self.level, action)]
         new_lineup.sort()
 
         if self.level + 1 in self.nodes:
