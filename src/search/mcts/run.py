@@ -6,7 +6,7 @@ if __name__ == '__main__':
     empty_positions = ['PG','SG','SF','PF','C','F','G','UTIL']
     dataframe = load_dataframe('2021_03_12_slate.csv', empty_positions)
     budget = 50000
-    mcts_tree = MCTSTree(dataframe, empty_positions, budget, exploration=7.)
+    mcts_tree = MCTSTree(dataframe, empty_positions, budget, exploration=5.)
 
     start = time.time()
     best_node = mcts_tree.run(500000)
