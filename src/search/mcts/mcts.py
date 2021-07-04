@@ -103,16 +103,17 @@ def encode_positions(available_positions):
 
 class MCTSTree():
 
-    def __init__(self, dataframe, empty_positions, budget, exploration=1.):
+    def __init__(self, dataframe, positions, budget, exploration=1.):
         self.nodes = {}
         self.dataframe = dataframe
         self.player_names = dataframe['PLAYER_NAME'].to_numpy()
         self.salaries = dataframe['SALARY'].to_numpy()
         self.scores = dataframe['FPTS'].to_numpy()
         self.positions, self.available_pos = encode_positions(dataframe['POSITIONS'].to_numpy())
+        self.positions_names = positions
 
         self.empty_positions = np.zeros(len(self.positions), dtype=np.uint8)
-        for pos in empty_positions:
+        for pos in positions:
             index = self.positions.index(pos)
             self.empty_positions[index] = 1
 
@@ -142,9 +143,11 @@ class MCTSTree():
                 minutes, seconds = divmod(elapsed_time, 60)
                 eta = (n_simulations - sim) * elapsed_time / (sim + 1)
                 minutes_left, seconds_left = divmod(eta, 60)
-                time_print = f"[{minutes:02.0f}:{seconds:02.0f}-{minutes_left:02.0f}:{seconds_left:02.0f}]"
+                time_print = f"[{minutes:02.0f}:{seconds:02.0f}-" \
+                             f"{minutes_left:02.0f}:{seconds_left:02.0f}]"
                 n_nodes = {level:len(self.nodes[level]) for level in self.nodes}
-                print(f"{sim+1}/{n_simulations} - {time_print} - {running_average_eval:.2f} avg reward - nodes per level {n_nodes}")
+                print(f"{sim+1}/{n_simulations} - {time_print}"
+                      f"- {running_average_eval:.2f} avg reward - nodes per level {n_nodes}")
         return self.best_node
 
     def select(self) -> MCTSNode:
