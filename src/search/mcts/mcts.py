@@ -121,7 +121,7 @@ class MCTSTree():
 
         self.root = MCTSNode(self.salaries, self.player_names, self.available_pos, self.scores,
             0, [], self.empty_positions, budget, nodes=self.nodes)
-        self.nodes[0]= [self.root]
+        self.nodes[0] = [self.root]
         self.exploration = exploration
         self.best_node = None
 
