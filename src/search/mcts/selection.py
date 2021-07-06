@@ -1,6 +1,6 @@
 import numpy as np
 
-def UCB(values, visits, c=np.sqrt(2), unexplored_value=np.inf):
+def UCB(values, visits, c=np.sqrt(0.5), unexplored_value=np.inf):
     exploration = c * np.sqrt( np.log(np.sum(visits)) / visits )
     exploration = np.where(visits == 0, unexplored_value, exploration)
     return values + exploration

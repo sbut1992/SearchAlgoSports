@@ -1,7 +1,7 @@
 import numpy as np
 from copy import copy
 import time
-
+import wandb
 from src.processing.load_dataframe import get_legal_actions
 from src.search.mcts.selection import UCB
 
@@ -21,7 +21,7 @@ class MCTSNode():
         self.nodes = nodes
         self.level = level
         self.legal_actions = get_legal_actions(salaries, names, available_pos, 
-            empty_positions, self.players_lineup, self.budget_left,self.level)
+            empty_positions, self.players_lineup, self.budget_left, self.level)
 
         self.children = [None for _ in self.legal_actions]
         self.children_visits = np.array([0 for _ in self.legal_actions])
@@ -29,12 +29,9 @@ class MCTSNode():
 
     def build_children(self, action:int):
         new_empty_positions = copy(self.empty_positions)
-        position = np.random.choice(np.where(
-            np.logical_and(self.available_pos[action][self.level], self.empty_positions)
-        )[0])
-        new_empty_positions[position] = 0
+        new_empty_positions[self.level] = 0
 
-        new_lineup = self.lineup + [(position, action)]
+        new_lineup = self.lineup + [(self.level, action)]
         new_lineup.sort()
 
         if self.level + 1 in self.nodes:
@@ -106,22 +103,23 @@ def encode_positions(available_positions):
 
 class MCTSTree():
 
-    def __init__(self, dataframe, empty_positions, budget, exploration=1.):
+    def __init__(self, dataframe, positions, budget, exploration=1.):
         self.nodes = {}
         self.dataframe = dataframe
         self.player_names = dataframe['PLAYER_NAME'].to_numpy()
         self.salaries = dataframe['SALARY'].to_numpy()
         self.scores = dataframe['FPTS'].to_numpy()
         self.positions, self.available_pos = encode_positions(dataframe['POSITIONS'].to_numpy())
+        self.positions_names = positions
 
         self.empty_positions = np.zeros(len(self.positions), dtype=np.uint8)
-        for pos in empty_positions:
+        for pos in positions:
             index = self.positions.index(pos)
             self.empty_positions[index] = 1
 
         self.root = MCTSNode(self.salaries, self.player_names, self.available_pos, self.scores,
             0, [], self.empty_positions, budget, nodes=self.nodes)
-        self.nodes[0]= [self.root]
+        self.nodes[0] = [self.root]
         self.exploration = exploration
         self.best_node = None
 
@@ -133,6 +131,8 @@ class MCTSTree():
             start_node, path, actions_ids = self.select()
             sim_path, sim_actions_ids = self.simulation(start_node)
             reward = self.evaluate(sim_path[-1], verbose)
+            wandb.log({'lineup_score': reward})
+
             self.backpropagate(reward, path[:-1] + sim_path, actions_ids + sim_actions_ids)
 
             if running_average_eval is None:
@@ -145,9 +145,11 @@ class MCTSTree():
                 minutes, seconds = divmod(elapsed_time, 60)
                 eta = (n_simulations - sim) * elapsed_time / (sim + 1)
                 minutes_left, seconds_left = divmod(eta, 60)
-                time_print = f"[{minutes:02.0f}:{seconds:02.0f}-{minutes_left:02.0f}:{seconds_left:02.0f}]"
+                time_print = f"[{minutes:02.0f}:{seconds:02.0f}-" \
+                             f"{minutes_left:02.0f}:{seconds_left:02.0f}]"
                 n_nodes = {level:len(self.nodes[level]) for level in self.nodes}
-                print(f"{sim+1}/{n_simulations} - {time_print} - {running_average_eval:.2f} avg reward - nodes per level {n_nodes}")
+                print(f"{sim+1}/{n_simulations} - {time_print}"
+                      f"- {running_average_eval:.2f} avg reward - nodes per level {n_nodes}")
         return self.best_node
 
     def select(self) -> MCTSNode:
@@ -162,11 +164,11 @@ class MCTSTree():
         actions_ids = []
 
         while not node.is_leaf:
-            # selection_criterion = UCB(
-            #     node.children_values, node.children_visits, self.exploration)
-            # action_id = np.argmax(selection_criterion)
+            selection_criterion = UCB(
+                node.children_values, node.children_visits, self.exploration)
+            action_id = np.argmax(selection_criterion)
             action_ids = range(len(node.legal_actions))
-            action_id = np.random.choice(action_ids)
+            # action_id = np.random.choice(action_ids)
             node = node.get_child_by_id(action_id)
             path.append(node)
             actions_ids.append(action_id)
