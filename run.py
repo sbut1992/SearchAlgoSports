@@ -6,7 +6,8 @@ import wandb
 if __name__ == '__main__':
 
     hyperparameters_default = {
-        'exploration': 5.
+        'exploration': 100,
+        'n_simulations': 300000
     }
 
     wandb.init(project='searchalgosportsteam', entity='searchalgosports',
@@ -19,7 +20,7 @@ if __name__ == '__main__':
     mcts_tree = MCTSTree(dataframe, empty_positions, budget, exploration=config.exploration)
 
     start = time.time()
-    best_node = mcts_tree.run(10000)
+    best_node = mcts_tree.run(config.n_simulations)
 
     print(f'Best config found in {time.time()-start:.1f}s: {best_node} with value {best_node.value}')
     wandb.log({'best_lineup_score': best_node.value})
