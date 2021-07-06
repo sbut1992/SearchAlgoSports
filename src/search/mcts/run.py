@@ -2,7 +2,8 @@ from src.processing.load_dataframe import load_dataframe
 from src.search.mcts.mcts import MCTSTree
 import time
 import wandb
-wandb.init(project="my-test-project")
+wandb.init(project='searchalgosportsteam', entity='searchalgosports')
+config = wandb.config
 
 if __name__ == '__main__':
     empty_positions = ['PG','SG','SF','PF','C','F','G','UTIL']
