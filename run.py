@@ -19,6 +19,7 @@ if __name__ == '__main__':
     mcts_tree = MCTSTree(dataframe, empty_positions, budget, exploration=config.exploration)
 
     start = time.time()
-    best_node = mcts_tree.run(5000)
-    print(f'Best config found in {time.time()-start:.1f}s: {best_node} with value {best_node.value}')
+    best_node = mcts_tree.run(10000)
 
+    print(f'Best config found in {time.time()-start:.1f}s: {best_node} with value {best_node.value}')
+    wandb.log({'best_lineup_score': best_node.value})
