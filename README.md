@@ -21,7 +21,6 @@ pip install -r requirements.txt
 
 # Quick-start
 
-## MCTS search
 ``` bash
-python -m src.search.mcts.run
+python run.py
 ```
